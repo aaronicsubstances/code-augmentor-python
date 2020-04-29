@@ -14,11 +14,7 @@ class ProcessCodeContext:
         return GeneratedCode()
 
     # Intended for use by scripts
-    def newContent(self, content):
-        return ContentPart(content, False)
-
-    # Intended for use by scripts
-    def newContent(self, content, exactMatch):
+    def newContent(self, content, exactMatch=False):
         return ContentPart(content, exactMatch)
         
     @property

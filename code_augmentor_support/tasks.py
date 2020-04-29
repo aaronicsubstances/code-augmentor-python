@@ -104,7 +104,15 @@ class ProcessCodeTask:
             converted = []
             if isinstance(result, (list, tuple, set)):
                 for item in result:
-                    converted.append(self._convertGenCodeItem(item))
+                    genCode = self._convertGenCodeItem(item)
+                    converted.append(genCode)
+                    # try and mark corresponding aug code as processed.
+                    if genCode['id'] > 0:
+                        correspondingAugCodes = [x for x in
+                            context.fileAugCodes['augmentingCodes']
+                                if x['id'] == genCode['id']]
+                        if correspondingAugCodes:
+                            correspondingAugCodes[0]['processed'] = True
             else:
                 genCode = self._convertGenCodeItem(result)
                 genCode['id'] = augCode['id']
@@ -129,10 +137,12 @@ class ProcessCodeTask:
         
     def _validateGeneratedCodeIds(self, genCodes, context):
         ids = [x['id'] for x in genCodes]
-        if [x for x in ids if x <= 0]:
+        # Interpret use of -1 or negatives as intentional and skip
+        # validating negative ids.
+        if [x for x in ids if not x]:
             self._createException(context, 'At least one generated code id was not set. Found: ' + str(ids))
-        elif len(set(ids)) < len(ids):
-            self._createException(context, 'Generated code ids must be unique, but found duplicates: ' + str(ids))            
+        elif len(set(x for x in ids if x > 0)) < len(ids):
+            self._createException(context, 'Valid generated code ids must be unique, but found duplicates: ' + str(ids))            
     
     def _createException(self, context, message, evalExInfo=None):
         lineMessage = ''
