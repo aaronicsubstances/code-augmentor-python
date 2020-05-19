@@ -21,7 +21,9 @@ class ProcessCodeTask:
         self._allErrors.clear()
         
         # ensure dir exists for outputFile
-        os.makedirs(os.path.dirname(self._outputFile), exist_ok=True)
+        outputDir = os.path.dirname(self._outputFile)
+        if outputDir:
+            os.makedirs(outputDir, exist_ok=True)
         
         context = ProcessCodeContext()
         
