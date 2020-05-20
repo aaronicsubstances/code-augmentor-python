@@ -68,6 +68,7 @@ class GeneratedCode:
         self.skipped = False
         self.replaceAugCodeDirectives = False
         self.replaceGenCodeDirectives = False
+        self.disableAutoIndent = False
         
     def toDict(self):
         contentPartsAsDicts = []
@@ -82,7 +83,8 @@ class GeneratedCode:
             'indent' : self.indent,
             'skipped': self.skipped,
             'replaceAugCodeDirectives': self.replaceAugCodeDirectives,
-            'replaceGenCodeDirectives': self.replaceGenCodeDirectives
+            'replaceGenCodeDirectives': self.replaceGenCodeDirectives,
+            'disableAutoIndent': self.disableAutoIndent
         }
         return dictRepr
 
