@@ -59,6 +59,18 @@ def test_usage_with_production_evaler(tmpdir):
     
     assert len(task.allErrors) == 2
     print(f'\nExpected {len(task.allErrors)} error(s)')
+    
+def test_usage_with_missing_evaler_return_value(tmpdir):
+    task = ProcessCodeTask()
+    task.inputFile = os.path.join(os.path.dirname(__file__), 'resources', 'aug_codes-01.json')
+    task.outputFile = os.path.join(tmpdir, 'genCodes-py-ignore.json')
+    
+    printHeader('test_usage_with_production_evaler')
+    task.execute(evalerWithoutReturn)
+    printErrors(task)
+    
+    assert len(task.allErrors) == 1
+    print(f'\nExpected {len(task.allErrors)} error(s)')
 
 def printHeader(testName):
     print()
@@ -87,3 +99,6 @@ def evalerProducingDuplicateIds(functionName, augCode, context):
     
 def productionEvaler(functionName, augCode, context):
     return eval(functionName + '(augCode, context)')
+
+def evalerWithoutReturn(functionName, augCode, context):
+    pass

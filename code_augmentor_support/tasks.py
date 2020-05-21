@@ -102,7 +102,7 @@ class ProcessCodeTask:
             result = evalFunction(functionName, augCode, context)
             
             if result == None:
-                return []
+                return [ self._convertGenCodeItem(None) ]
             converted = []
             if isinstance(result, (list, tuple, set)):
                 for item in result:
