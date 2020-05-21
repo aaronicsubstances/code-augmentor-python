@@ -141,9 +141,10 @@ class ProcessCodeTask:
         ids = [x['id'] for x in genCodes]
         # Interpret use of -1 or negatives as intentional and skip
         # validating negative ids.
+        validIds = [x for x in ids if x > 0]
         if [x for x in ids if not x]:
             self._createException(context, 'At least one generated code id was not set. Found: ' + str(ids))
-        elif len(set(x for x in ids if x > 0)) < len(ids):
+        elif len(set(validIds)) < len(validIds):
             self._createException(context, 'Valid generated code ids must be unique, but found duplicates: ' + str(ids))            
     
     def _createException(self, context, message, evalExInfo=None):

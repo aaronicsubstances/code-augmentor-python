@@ -1,0 +1,2 @@
+{"contentStreamingEnabled":true}
+{"fileId":1,"dir":"C:\\Users\\Aaron\\AppData\\Local\\Temp","relativePath":"task-spec-01-0.java","augmentingCodes":[{"id":1,"blocks":[{"content":" println(\"Hello World from JS-star\")\r\n var i \u003d 3 + new Date(); \r\n ...etc*/","stringify":false,"jsonify":false}],"directiveMarker":"//JS","indent":"","lineNumber":29,"lineSeparator":"\r\n"},{"id":2,"blocks":[{"content":" println(\"World\")","stringify":false,"jsonify":false}],"directiveMarker":"//JS","indent":"","lineNumber":44,"lineSeparator":"\r\n"}]}
