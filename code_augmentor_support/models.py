@@ -1,4 +1,22 @@
-# models used with code augmentor are defined here.
+import json
+from types import SimpleNamespace as Object
+
+class JsonDumpHelper(json.JSONEncoder):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def default(self, o):
+        if isinstance(o, Object):
+            return self._convertObjectToDict(o)
+        return super().default(o)
+        
+    def _convertObjectToDict(self, o):
+        d = dict(o.__dict__)
+        for k in d.keys():
+            v = d[k]
+            if isinstance(v, Object):
+                d[k] = self._convertObjectToDict(v)
+        return d
 
 class ProcessCodeContext:
     def __init__(self):
@@ -11,11 +29,11 @@ class ProcessCodeContext:
 
     # Intended for use by scripts
     def newGenCode(self):
-        return GeneratedCode()
+        return Object(id = 0, contentParts = [])
 
     # Intended for use by scripts
     def newContent(self, content, exactMatch=False):
-        return ContentPart(content, exactMatch)
+        return Object(content = content, exactMatch = exactMatch)
         
     @property
     def header(self):
@@ -58,40 +76,3 @@ class ProcessCodeContext:
     @srcFile.setter
     def srcFile(self, value):
         self._srcFile = value
-
-
-class GeneratedCode:
-    def __init__(self):
-        self.id = 0
-        self.contentParts = []
-        self.indent = None
-        self.skipped = False
-        self.replaceAugCodeDirectives = False
-        self.replaceGenCodeDirectives = False
-        self.disableAutoIndent = False
-        
-    def toDict(self):
-        contentPartsAsDicts = []
-        for c in self.contentParts:
-            contentPartsAsDicts.append({
-                'content': c.content,
-                'exactMatch': c.exactMatch
-            })
-        dictRepr = {
-            'id': self.id,
-            'contentParts': contentPartsAsDicts,
-            'indent' : self.indent,
-            'skipped': self.skipped,
-            'replaceAugCodeDirectives': self.replaceAugCodeDirectives,
-            'replaceGenCodeDirectives': self.replaceGenCodeDirectives,
-            'disableAutoIndent': self.disableAutoIndent
-        }
-        return dictRepr
-
-class ContentPart:
-    def __init__(self, content, exactMatch):
-        self.content = content
-        self.exactMatch = exactMatch
-
-    def __str__(self):
-        return f"ContentPart{{content={self.content}, exactMatch={self.exactMatch}}}"

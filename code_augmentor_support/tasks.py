@@ -4,10 +4,15 @@ import os.path
 import sys
 import traceback
 
-from .models import ProcessCodeContext, GeneratedCode, ContentPart
+from types import SimpleNamespace as Object
+
+from .models import ProcessCodeContext, JsonDumpHelper
+
+def jsonParse(str):
+    return json.loads(str, object_hook=lambda d: Object(**d))
 
 def compactJsonDump(obj):
-    return json.dumps(obj, separators=(',', ':'))
+    return json.dumps(obj, cls=JsonDumpHelper, separators=(',', ':'))
 
 class ProcessCodeTask:
     def __init__(self):
@@ -15,7 +20,6 @@ class ProcessCodeTask:
         self._outputFile = None
         self._verbose = True
         self._allErrors = []
-                
         
     def execute(self, evalFunction):
         self._allErrors.clear()
@@ -36,45 +40,45 @@ class ProcessCodeTask:
             for line in codeGenRequest:
                 # begin deserialize by reading header from input
                 if not headerSeen:
-                    context.header = json.loads(line)
+                    context.header = jsonParse(line)
                     headerSeen = True
                     continue
                     
-                fileAugCodes = json.loads(line)
+                fileAugCodes = jsonParse(line)
                 
                 # set up context.
-                context.srcFile = os.path.join(fileAugCodes['dir'],
-                    fileAugCodes['relativePath'])
+                context.srcFile = os.path.join(fileAugCodes.dir,
+                    fileAugCodes.relativePath)
                 context.fileAugCodes = fileAugCodes
                 context.fileScope.clear()
                 self.logVerbose("Processing {0}", context.srcFile)
                 
                 # fetch arguments and parse any json arguments found
-                fileAugCodesList = fileAugCodes['augmentingCodes']
+                fileAugCodesList = fileAugCodes.augmentingCodes
                 for augCode in fileAugCodesList:
-                    augCode['processed'] = False
-                    augCode['args'] = []
-                    for block in augCode['blocks']:
-                        if block['jsonify']:
-                            parsedArg = json.loads(block['content'])
-                            augCode['args'].append(parsedArg)
-                        elif block['stringify']:
-                            augCode['args'].append(block['content'])
+                    augCode.processed = False
+                    augCode.args = []
+                    for block in augCode.blocks:
+                        if block.jsonify:
+                            parsedArg = jsonParse(block.content)
+                            augCode.args.append(parsedArg)
+                        elif block.stringify:
+                            augCode.args.append(block.content)
                 
                 # process aug codes            
                 fileGenCodeList = []
-                fileGenCodes = {
-                    'fileId': fileAugCodes['fileId'],
-                    'generatedCodes': fileGenCodeList
-                }
+                fileGenCodes = Object(
+                    fileId = fileAugCodes.fileId,
+                    generatedCodes = fileGenCodeList
+                )
                 beginErrorCount = len(self._allErrors)
                 for i in range(len(fileAugCodesList)):
                     augCode = fileAugCodesList[i]
-                    if augCode['processed']:
+                    if augCode.processed:
                         continue
                         
                     context.augCodeIndex = i
-                    functionName = augCode['blocks'][0]['content'].strip()
+                    functionName = augCode.blocks[0].content.strip()
                     genCodes = self._processAugCode(evalFunction, functionName, augCode, context)
                     fileGenCodeList.extend(genCodes)
                     
@@ -109,15 +113,15 @@ class ProcessCodeTask:
                     genCode = self._convertGenCodeItem(item)
                     converted.append(genCode)
                     # try and mark corresponding aug code as processed.
-                    if genCode['id'] > 0:
+                    if genCode.id > 0:
                         correspondingAugCodes = [x for x in
-                            context.fileAugCodes['augmentingCodes']
-                                if x['id'] == genCode['id']]
+                            context.fileAugCodes.augmentingCodes
+                                if x.id == genCode.id]
                         if correspondingAugCodes:
-                            correspondingAugCodes[0]['processed'] = True
+                            correspondingAugCodes[0].processed = True
             else:
                 genCode = self._convertGenCodeItem(result)
-                genCode['id'] = augCode['id']
+                genCode.id = augCode.id
                 converted.append(genCode)
             return converted
         except BaseException as evalEx:
@@ -126,19 +130,20 @@ class ProcessCodeTask:
 
     def _convertGenCodeItem(self, item):
         if item == None:
-            genCode = GeneratedCode()
-        elif isinstance(item, GeneratedCode):
-            genCode = item
-        elif isinstance(item, ContentPart):
-            genCode = GeneratedCode()
-            genCode.contentParts.append(item)
+            return Object(id = 0)
+        elif hasattr(item, 'contentParts'):
+            if not hasattr(item, 'id'):
+                item.id = 0
+            return item
+        elif hasattr(item, 'content'):
+            return Object(id = 0, contentParts = [ item ])
         else:
-            genCode = GeneratedCode()
-            genCode.contentParts.append(ContentPart(str(item), False))
-        return genCode.toDict()
+            content = str(item)
+            contentPart = Object(content = content, exactMatch = False)
+            return Object(id = 0, contentParts = [ contentPart ])
         
     def _validateGeneratedCodeIds(self, genCodes, context):
-        ids = [x['id'] for x in genCodes]
+        ids = [x.id for x in genCodes]
         # Interpret use of -1 or negatives as intentional and skip
         # validating negative ids.
         validIds = [x for x in ids if x > 0]
@@ -151,9 +156,9 @@ class ProcessCodeTask:
         lineMessage = ''
         stackTrace = ''
         if evalExInfo:
-            augCode = context.fileAugCodes['augmentingCodes'][context.augCodeIndex]
-            lineMessage = F" at line {augCode['lineNumber']}"
-            message = "{0}: {1}".format(augCode['blocks'][0]['content'], 
+            augCode = context.fileAugCodes.augmentingCodes[context.augCodeIndex]
+            lineMessage = F" at line {augCode.lineNumber}"
+            message = "{0}: {1}".format(augCode.blocks[0].content, 
                 "".join(traceback.format_exception_only(evalExInfo[0], evalExInfo[1])))
             stackTrace = '\n' + "".join(
                 traceback.format_exception(evalExInfo[0], evalExInfo[1], evalExInfo[2]))
