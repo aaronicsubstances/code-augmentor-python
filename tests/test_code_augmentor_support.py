@@ -1,7 +1,6 @@
 import os.path
 import sys
 
-from code_augmentor_support import __version__
 from code_augmentor_support.tasks import ProcessCodeTask
 
 # launch with: poetry run pytest tests -s
