@@ -1,6 +1,6 @@
-# code_augmentor_support
+# code-augmentor-support
 
-This package enables the use of Python 3 as a scripting platform to generate code to serve the goals of [Code Augmentor](https://github.com/aaronicsubstances/code-augmentor).
+This package enables the use of Python 3 as a scripting platform to generate code to serve the goals of Code Augmentor.
 
 Code Augmentor is a set of libraries, plugins and tools for bringing code generation techniques to every programmer. For a more detailed explanation please visit the main Code Augmentor Github repository [here](https://github.com/aaronicsubstances/code-augmentor).
 
@@ -9,7 +9,7 @@ As far as this package and Python 3 developers are concerned, it is enough to th
 
 ## Install
 
-`pip install code_augmentor_support`
+`pip install code-augmentor-support`
 
 ### Example
 
@@ -98,7 +98,7 @@ The library's functionality is contained in the method `execute` of the class `P
 
 Instances of `ProcessCodeTask` have the following properties:
 
-   * `inputFile` - path to the code generation request. Must be the prep file result of running the *code_aug_prepare* Ant task.
+   * `inputFile` - path to the code generation request. Must be the aug code file result of running the *code_aug_prepare* Ant task.
    * `outputFile` - path for writing out code generation response. Will be used as the gen code file input to the *code_aug_complete* Ant task.
    * `verbose` - boolean property which can be used with default verbose logging mechansim to disable printing of verbose mesages to standard output.
    * `allErrors` - array which contains any errors encountered during execution.
@@ -106,7 +106,7 @@ Instances of `ProcessCodeTask` have the following properties:
 These methods can be overriden in a subclass:
    * `logVerbose`, `logInfo`, `logWarn` - methods which are called with a format string, *args, and **kwargs, when a verbose message, normal message, or warning message is issued. By default all messages are printed to standard output.
 
-The `evalFunction` function argument of the `execute` method is called with 3 arguments. The first is name of a function to invoke in the current Python 3 scope, and the remaining two are an augmenting code object and a helper instance of the `ProcessCodeContext` from the `models` module of this package. These remaining two arguments are the arguments passed to the function to be invoked.
+The `evalFunction` function argument of the `execute` method is called with 3 arguments. The first is name of a function to invoke in the current Python scope, and the remaining two are an augmenting code object and a helper instance of the `ProcessCodeContext` class from the `models` module of this package. These remaining two arguments are the arguments passed to the function to be invoked.
 
 The `evalFunction` is called with every augmenting code object encountered in the input file. It is expected to in turn call client-defined functions dynamically and receive from them a correponding generated code object to be written to the output file. As a convenience, it can return strings, content parts, and arrays of generated code objects.
 
@@ -129,11 +129,6 @@ By so doing clients are provided with the convenience that any arbitrary field c
 
 The default Python behaviour will apply though, when trying to access non-existent fields on a deserialized JSON object by raising an error. In that case, the function `hasattr` will have to be called first.
 
-
 ## Further Information
 
-Visit this package's Github repository to find out more on 
-
-   * structure of augmenting code object
-   * structure of generated code object
-   * other matters
+For more information on the structure of augmenting code object, generated code object and other considerations, refer to [wiki](https://github.com/aaronicsubstances/code-augmentor/wiki/Documentation-for-Code-Generator-Scripts) in the main Code Augmentor repository.
