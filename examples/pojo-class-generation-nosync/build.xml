@@ -1,0 +1,60 @@
+<project name="pojo-class-generation-nosync" default="default">
+    <description>Build file for pojo-class-generation-nosync</description>
+
+    <property name="src.dir" location="src" />
+    <property name="build.dir" location="build" />
+    <property name="build.code-augmentor.dir" location="${build.dir}/codeAugmentor" />
+    <property name="code-augmentor.verbose" value="true" />
+    <property name="augCode.file" location="${build.code-augmentor.dir}/augCodes.json" />
+    <property name="genCode.file" location="${build.code-augmentor.dir}/genCodes.json" />
+    <property name="generated.dir" location="generated" />
+    <property name="script.executable.path" value="python" />
+    <property name="codeGenScripts.dir" location="codeGenScripts" />
+    <property name="codeGenScripts.main" value="main.py" />
+    <property name="poetry.path" value="poetry" />
+    <property name="check-exec.test-input" location="test-input.json" />
+    
+    <!--only needed for get started tutorial-->
+    <target name="check-exec" description="verifies script platform is successfully set up">
+        <exec executable="${poetry.path}" failonerror="true" vmlauncher="false" dir="${codeGenScripts.dir}">
+            <arg value="run" />
+            <arg value="${script.executable.path}" />
+            <arg value="${codeGenScripts.main}" />
+            <arg value="${check-exec.test-input}" />
+            <arg value="${generated.dir}/test-output.json" />
+        </exec>
+    </target>
+    
+    <target name="default" description="runs entire code augmentor operation with default settings">
+        <delete dir="${build.dir}" />
+        
+        <code_aug_prepare verbose="${code-augmentor.verbose}">
+            <srcDir dir="${src.dir}">
+                <include name="*.java" />
+            </srcDir>
+            <!--here we really wished there was a way to disable these 5 directives.
+                a default value is used if each is omitted.
+                So we forcefully disable by setting it to a value which cannot be
+                found: by putting a newline in the directive. Also make them unique.
+            -->
+            <genCodeStartDirective value="1&#10;" />
+            <genCodeEndDirective value="2&#10;" />
+            <skipCodeStartDirective value="3&#10;" />
+            <skipCodeEndDirective value="4&#10;" />
+            <inlineGenCodeDirectives value="5&#10;" />
+        </code_aug_prepare>
+    
+        <exec executable="${poetry.path}" failonerror="true" vmlauncher="false" dir="${codeGenScripts.dir}">
+            <arg value="run" />
+            <arg value="${script.executable.path}" />
+            <arg value="${codeGenScripts.main}" />
+            <arg value="${augCode.file}" />
+            <arg value="${genCode.file}" />
+            <arg value="${code-augmentor.verbose}" />
+        </exec>
+    
+        <code_aug_complete verbose="${code-augmentor.verbose}" destDir="${generated.dir}"
+            codeChangeDetectionDisabled="true" />
+    </target>
+    
+</project>

@@ -1,0 +1,56 @@
+<project name="pojo-class-generation-with-sync" default="default">
+    <description>Build file for pojo-class-generation-with-sync</description>
+
+    <property name="generatedSrc.dir" location="tempSrc" />
+    <property name="build.dir" location="build" />
+    <property name="build.code-augmentor.dir" location="${build.dir}/codeAugmentor" />
+    <property name="code-augmentor.verbose" value="true" />
+    <property name="augCode.file" location="${build.code-augmentor.dir}/augCodes.json" />
+    <property name="genCode.file" location="${build.code-augmentor.dir}/genCodes.json" />
+    <property name="generated.dir" location="generated" />
+    <property name="script.executable.path" value="python" />
+    <property name="codeGenScripts.dir" location="codeGenScripts" />
+    <property name="codeGenScripts.main" value="main.py" />
+    <property name="poetry.path" value="poetry" />
+    <property name="check-exec.test-input" location="test-input.json" />
+    
+    <!--only needed for get started tutorial-->
+    <target name="check-exec" description="verifies script platform is successfully set up">
+        <delete dir="${generatedSrc.dir}" />
+        <copy todir="${generatedSrc.dir}">
+            <resources>
+                <file file="Main.java" />
+                <file file="SimplePerson.java" />
+            </resources>
+        </copy>
+        <exec executable="${poetry.path}" failonerror="true" vmlauncher="false" dir="${codeGenScripts.dir}">
+            <arg value="run" />
+            <arg value="${script.executable.path}" />
+            <arg value="${codeGenScripts.main}" />
+            <arg value="${check-exec.test-input}" />
+            <arg value="${generated.dir}/test-output.json" />
+        </exec>
+    </target>
+    
+    <target name="default" description="runs entire code augmentor operation with default settings">
+        <delete dir="${build.dir}" />
+        
+        <code_aug_prepare verbose="${code-augmentor.verbose}">
+            <srcDir dir="${generatedSrc.dir}">
+                <include name="*.java" />
+            </srcDir>
+        </code_aug_prepare>
+    
+        <exec executable="${poetry.path}" failonerror="true" vmlauncher="false" dir="${codeGenScripts.dir}">
+            <arg value="run" />
+            <arg value="${script.executable.path}" />
+            <arg value="${codeGenScripts.main}" />
+            <arg value="${augCode.file}" />
+            <arg value="${genCode.file}" />
+            <arg value="${code-augmentor.verbose}" />
+        </exec>
+    
+        <code_aug_complete verbose="${code-augmentor.verbose}" destDir="${generated.dir}" />
+    </target>
+    
+</project>

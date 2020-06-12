@@ -1,0 +1,17 @@
+[[package]]
+category = "main"
+description = "Enables the use of Python 3 to write code generator scripts for Code Augmentor"
+name = "code-augmentor-support"
+optional = false
+python-versions = ">=3.5,<4.0"
+version = "1.0.0"
+
+[metadata]
+content-hash = "82e109b5eee717696618a94bd7c74e747d11738c3d5064ff5d48dc599d9e83a7"
+python-versions = "^3.5"
+
+[metadata.files]
+code-augmentor-support = [
+    {file = "code_augmentor_support-1.0.0-py3-none-any.whl", hash = "sha256:5c142ff85fcf24fe8208bbefc1841959a9b827c38ce456062daa6e580c71dbb4"},
+    {file = "code_augmentor_support-1.0.0.tar.gz", hash = "sha256:1bed8ace67ebfbb82f72fd8ab5bc905c93cbb45874f422ad92b011a7231c6e6c"},
+]
