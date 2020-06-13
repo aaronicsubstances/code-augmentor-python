@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "codeGenScripts"
-version = "0.1.0"
+version = "1.0.1"
 description = ""
 authors = ["Aaron Baffour-Awuah <aaronbaffourawuah@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.5"
-code-augmentor-support = "^1.0.0"
+code-augmentor-support = "^1.0.1"

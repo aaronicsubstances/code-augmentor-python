@@ -100,11 +100,11 @@ Instances of `ProcessCodeTask` have the following properties:
 
    * `inputFile` - path to the code generation request. Must be the aug code file result of running the *code_aug_prepare* Ant task.
    * `outputFile` - path for writing out code generation response. Will be used as the gen code file input to the *code_aug_complete* Ant task.
-   * `verbose` - boolean property which can be used with default verbose logging mechansim to disable printing of verbose mesages to standard output.
+   * `verbose` - boolean property which can be used with default verbose logging mechansim to enable printing of verbose mesages to standard output.
    * `allErrors` - array which contains any errors encountered during execution.
    
 These methods can be overriden in a subclass:
-   * `logVerbose`, `logInfo`, `logWarn` - methods which are called with a format string, *args, and **kwargs, when a verbose message, normal message, or warning message is issued. By default all messages are printed to standard output.
+   * `logVerbose`, `logInfo`, `logWarn` - methods which are called with a format string, *args, and **kwargs, when a verbose message, normal message, or warning message is issued. By default all normal and warning messages are printed to standard output, and verbose messages are ignored.
 
 The `evalFunction` function argument of the `execute` method is called with 3 arguments. The first is name of a function to invoke in the current Python scope, and the remaining two are an augmenting code object and a helper instance of the `ProcessCodeContext` class from the `models` module of this package. These remaining two arguments are the arguments passed to the function to be invoked.
 

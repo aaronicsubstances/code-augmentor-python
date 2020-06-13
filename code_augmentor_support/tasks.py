@@ -18,7 +18,7 @@ class ProcessCodeTask:
     def __init__(self):
         self._inputFile = None
         self._outputFile = None
-        self._verbose = True
+        self._verbose = False
         self._allErrors = []
         
     def execute(self, evalFunction):
