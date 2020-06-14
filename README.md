@@ -11,13 +11,15 @@ As far as this package and Python 3 developers are concerned, it is enough to th
 
 `pip install code-augmentor-support`
 
-### Example
+If using poetry, can rather use `poetry install code-augmentor-support`
+
+## Example
 
 Below is a main script demonstrating how to set up the library for use with functions defined in two client modules snippets.py and worker.py.
 
 It requires input and ouput file command-line arguments, and optional third argument to enable verbose logging.
 
-#### main.py
+### main.py
 
 ```python
 import os.path
@@ -52,14 +54,14 @@ if instance.allErrors:
     sys.exit(1)
 ```
 
-#### snippets.py
+### snippets.py
 
 ```python
 def generateSerialVersionUID(augCode, context):
     return "private static final int serialVersionUID = 23L;"
 ```
 
-#### worker.py
+### worker.py
 
 ```python
 def stringify(augCode, context):
@@ -74,7 +76,7 @@ def stringify(augCode, context):
     return g
 ```
 
-#### test-augCodes.json (sample input file)
+### test-augCodes.json (sample input file)
 
 ```json
 { "genCodeStartDirective": "//:GS:", "genCodeEndDirective": "//:GE:", "embeddedStringDirective": "//:STR:", "embeddedJsonDirective": "//:JSON:", "skipCodeStartDirective": "//:SS:", "skipCodeEndDirective": "//:SE:", "augCodeDirective": "//:AUG_CODE:", "inlineGenCodeDirective": "//:GG:", "nestedLevelStartMarker": "[", "nestedLevelEndMarker": "]" }
@@ -83,7 +85,7 @@ def stringify(augCode, context):
 
 ```
 
-#### test-genCodes.json (expected output file)
+### test-genCodes.json (expected output file)
 
 ```json
 {}
@@ -121,7 +123,7 @@ The `evalFunction` is called with every augmenting code object encountered in th
    * newGenCode() - convenience method available to clients for creating a generated code object with empty `contentParts` array property.
    * newContent(content, exactMatch=false) - convenience method available to clients for creating a new content part object with properties set with arguments supplied to the function.
 
-## Note on JSON serialization
+### Note on JSON serialization
 
 This library deserializes JSON objects into instances of the class `types.SimpleNamespace`. It similarly requires objects to be serialized to be either dictionaries or instances of `types.SimpleNamespace`. 
 
@@ -132,3 +134,12 @@ The default Python behaviour will apply though, when trying to access non-existe
 ## Further Information
 
 For more information on the structure of augmenting code object, generated code object and other considerations, refer to [wiki](https://github.com/aaronicsubstances/code-augmentor/wiki/Documentation-for-Code-Generator-Scripts) in the main Code Augmentor repository.
+
+
+## Building and Testing Locally
+
+[Poetry](https://python-poetry.org/) is the build system for this project. So it is required to set up it first.
+
+   * Clone repository locally
+   * Install project dependencies with `poetry install`
+   * With all dependencies present locally, test project with `poetry run pytest tests -s`

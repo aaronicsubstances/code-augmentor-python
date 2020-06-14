@@ -3,9 +3,6 @@ import sys
 
 from code_augmentor_support.tasks import ProcessCodeTask
 
-# launch with: poetry run pytest tests -s
-
-#
 # Main purpose of tests in this project is to test
 # error cases and the formatting of thrown exceptions.
 # More thorough testing of success case scenerios is dealt with outside this
