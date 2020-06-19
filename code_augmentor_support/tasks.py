@@ -22,6 +22,10 @@ class ProcessCodeTask:
         self._allErrors = []
         
     def execute(self, evalFunction):
+        assert self._inputFile, "inputFile property is not set"
+        assert self._outputFile, "outputFile property is not set"
+        assert evalFunction
+
         self._allErrors.clear()
         
         # ensure dir exists for outputFile
@@ -78,7 +82,7 @@ class ProcessCodeTask:
                         continue
                         
                     context.augCodeIndex = i
-                    functionName = augCode.blocks[0].content.strip()
+                    functionName = self._retrieveFunctionName(augCode)
                     genCodes = self._processAugCode(evalFunction, functionName, augCode, context)
                     fileGenCodeList.extend(genCodes)
                     
@@ -100,7 +104,11 @@ class ProcessCodeTask:
     
     def logWarn(self, formatStr, *args, **kwargs):
         print("[WARN] " + formatStr.format(*args, **kwargs))
-    
+
+    def _retrieveFunctionName(self, augCode):
+        functionName = augCode.blocks[0].content.strip()
+        return functionName
+
     def _processAugCode(self, evalFunction, functionName, augCode, context):
         try:
             result = evalFunction(functionName, augCode, context)
@@ -131,7 +139,7 @@ class ProcessCodeTask:
     def _convertGenCodeItem(self, item):
         if item == None:
             return Object(id = 0)
-        elif hasattr(item, 'contentParts'):
+        elif hasattr(item, 'skipped') or hasattr(item, 'contentParts'):
             if not hasattr(item, 'id'):
                 item.id = 0
             return item

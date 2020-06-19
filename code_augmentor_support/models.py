@@ -21,7 +21,9 @@ class JsonDumpHelper(json.JSONEncoder):
 class ProcessCodeContext:
     def __init__(self):
         self._header = None
-        self._globalScope = {}
+        self._globalScope = {
+            'codeAugmentor_indent': (' ' * 4)
+        }
         self._fileScope = {}
         self._fileAugCodes = None
         self._augCodeIndex = 0
@@ -30,6 +32,10 @@ class ProcessCodeContext:
     # Intended for use by scripts
     def newGenCode(self):
         return Object(id = 0, contentParts = [])
+
+    # Intended for use by scripts
+    def newSkipGenCode(self):
+        return Object(id = 0, skipped = True)
 
     # Intended for use by scripts
     def newContent(self, content, exactMatch=False):
@@ -76,3 +82,28 @@ class ProcessCodeContext:
     @srcFile.setter
     def srcFile(self, value):
         self._srcFile = value
+
+    def getScopeVar(self, name):
+        if name in self._fileScope:
+            return self._fileScope[name]
+        if name in self._globalScope:
+            return self._globalScope[name]
+        return None
+
+class CodeAugmentorFunctions:
+    @staticmethod
+    def setScopeVar(augCode, context):
+        CodeAugmentorFunctions.modifyScope(context.fileScope, augCode)
+        return context.newSkipGenCode()
+
+    @staticmethod
+    def setGlobalScopeVar(augCode, context):
+        CodeAugmentorFunctions.modifyScope(context.globalScope, augCode)
+        return context.newSkipGenCode()
+
+    @staticmethod
+    def modifyScope(scope, augCode):
+        for arg in augCode.args:
+                for k, v in arg.__dict__.items():
+                    scope[k] = v
+

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "code-augmentor-support"
-version = "1.0.1"
+version = "2.0.0"
 description = "Enables the use of Python 3 to write code generator scripts for Code Augmentor"
 authors = ["Aaron Baffour-Awuah <aaronbaffourawuah@gmail.com>"]
 homepage = "https://github.com/aaronicsubstances/code-augmentor#readme"
