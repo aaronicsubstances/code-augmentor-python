@@ -17,16 +17,17 @@ def theClassProps(augCode, context):
 
 def generateClassProps(augCode, context):
     out = ''
+    defaultIndent = context.getScopeVar('codeAugmentor_indent')
     for propSpec in context.fileScope['theClassProps']:
         capitalized = propSpec.name.capitalize()
         out += f"public {propSpec.type} get{capitalized}()" + " {"
         out += augCode.lineSeparator
-        out += f"{OtherFunctions.defaultIndent()}return {propSpec.name};"
+        out += f"{defaultIndent}return {propSpec.name};"
         out += augCode.lineSeparator
         out += f"}}{augCode.lineSeparator}"
         out += f"public void set{capitalized}({propSpec.type} {propSpec.name})" + " {"
         out += augCode.lineSeparator
-        out += f"{OtherFunctions.defaultIndent()}this.{propSpec.name} = {propSpec.name};"
+        out += f"{defaultIndent}this.{propSpec.name} = {propSpec.name};"
         out += augCode.lineSeparator
         out += "}" + f"{augCode.lineSeparator}"
         out += augCode.lineSeparator
@@ -42,42 +43,43 @@ def generateEqualsAndHashCode(augCode, context):
         return ''
     
     out = ''
+    defaultIndent = context.getScopeVar('codeAugmentor_indent')
     
     # generate equals() override
     out += f"@Override{augCode.lineSeparator}"
     out += f"public boolean equals(Object obj) {{"
     out += augCode.lineSeparator
-    out += f"{OtherFunctions.defaultIndent()}if (!(obj instanceof {context.fileScope['theClassName']})) {{"
+    out += f"{defaultIndent}if (!(obj instanceof {context.fileScope['theClassName']})) {{"
     out += augCode.lineSeparator
-    out += f"{OtherFunctions.defaultIndent()}{OtherFunctions.defaultIndent()}return false;"
+    out += f"{defaultIndent}{defaultIndent}return false;"
     out += augCode.lineSeparator
-    out += f"{OtherFunctions.defaultIndent()}" + '}'
+    out += f"{defaultIndent}" + '}'
     out += augCode.lineSeparator
-    out += f"{OtherFunctions.defaultIndent()}{context.fileScope['theClassName']} other = ({context.fileScope['theClassName']}) obj;"
+    out += f"{defaultIndent}{context.fileScope['theClassName']} other = ({context.fileScope['theClassName']}) obj;"
     out += augCode.lineSeparator
     
     for propSpec in context.fileScope['theClassProps']:
         if propSpec.type[0].isupper():
-            out += OtherFunctions.defaultIndent()
+            out += defaultIndent
             out += 'if (!Objects.equals(this.'
             out += propSpec.name
             out += ', other.' 
             out += propSpec.name
             out += ')) {'
         else:
-            out += OtherFunctions.defaultIndent()
+            out += defaultIndent
             out += 'if (this.'
             out += propSpec.name
             out += ' != other.' 
             out += propSpec.name
             out += ') {'
         out += augCode.lineSeparator
-        out += f"{OtherFunctions.defaultIndent()}{OtherFunctions.defaultIndent()}return false;"
+        out += f"{defaultIndent}{defaultIndent}return false;"
         out += augCode.lineSeparator
-        out += OtherFunctions.defaultIndent() + '}'
+        out += defaultIndent + '}'
         out += augCode.lineSeparator
     
-    out += f"{OtherFunctions.defaultIndent()}return true;{augCode.lineSeparator}"
+    out += f"{defaultIndent}return true;{augCode.lineSeparator}"
     out += '}'
     out += augCode.lineSeparator
     out += augCode.lineSeparator
@@ -87,10 +89,10 @@ def generateEqualsAndHashCode(augCode, context):
     out += "public int hashCode() {"
     out += augCode.lineSeparator
     if len(context.fileScope['theClassProps']) == 1:
-        out += f"{OtherFunctions.defaultIndent()}return Objects.hashCode("
+        out += f"{defaultIndent}return Objects.hashCode("
         out += context.fileScope['theClassProps'][0].name
     else:
-        out += f"{OtherFunctions.defaultIndent()}return Objects.hash("
+        out += f"{defaultIndent}return Objects.hash("
         for i in range(len(context.fileScope['theClassProps'])):
             if i > 0:
                 out += ', '
@@ -106,11 +108,12 @@ def generateEqualsAndHashCode(augCode, context):
     return g
 
 def generateToString(augCode, context):
+    defaultIndent = context.getScopeVar('codeAugmentor_indent')
     out = ''
     out += f"@Override{augCode.lineSeparator}"
     out += "public String toString() {"
     out += augCode.lineSeparator
-    out += f"{OtherFunctions.defaultIndent()}return String.format(getClass().getSimpleName() + "
+    out += f"{defaultIndent}return String.format(getClass().getSimpleName() + "
     exactOut = '"{'
     outArgs = ''
     for i in range(len(context.fileScope['theClassProps'])):
@@ -127,8 +130,8 @@ def generateToString(augCode, context):
     if outArgs:
         out += ","
         out += augCode.lineSeparator
-        out += OtherFunctions.defaultIndent()
-        out += OtherFunctions.defaultIndent()
+        out += defaultIndent
+        out += defaultIndent
     out += outArgs
     out += f");{augCode.lineSeparator}"
     out += '}'

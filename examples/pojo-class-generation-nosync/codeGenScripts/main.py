@@ -3,11 +3,12 @@ import re
 import sys
 
 from code_augmentor_support.tasks import ProcessCodeTask
+from code_augmentor_support.models import CodeAugmentorFunctions
 
 import MyFunctions
 import OtherFunctions
 
-FUNCTION_NAME_REGEX = re.compile(r'^((MyFunctions|OtherFunctions)\.)[a-zA-Z]\w*$')
+FUNCTION_NAME_REGEX = re.compile(r'^(((.*CodeAugmentorFunctions)|MyFunctions|OtherFunctions)\.)[a-zA-Z]\w*$')
 def callUserFunction(functionName, augCode, context):
     # validate name.
     if not FUNCTION_NAME_REGEX.search(functionName):

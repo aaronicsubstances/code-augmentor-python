@@ -19,6 +19,15 @@ Below is a main script demonstrating how to set up the library for use with func
 
 It requires input and ouput file command-line arguments, and optional third argument to enable verbose logging.
 
+```
+python main.py test-augCodes.json actual.json
+```
+
+Or if using poetry,
+```
+poetry run python main.py test-augCodes.json actual.json
+```
+
 ### main.py
 
 ```python
@@ -27,11 +36,12 @@ import re
 import sys
 
 from code_augmentor_support.tasks import ProcessCodeTask
+from code_augmentor_support.models import CodeAugmentorFunctions
 
 import snippets
 import worker
 
-FUNCTION_NAME_REGEX = re.compile(r'^((snippets|worker)\.)[a-zA-Z]\w*$')
+FUNCTION_NAME_REGEX = re.compile(r'^(((.*CodeAugmentorFunctions)|snippets|worker)\.)[a-zA-Z]\w*$')
 def callUserFunction(functionName, augCode, context):
     # validate name.
     if not FUNCTION_NAME_REGEX.search(functionName):
@@ -85,7 +95,7 @@ def stringify(augCode, context):
 
 ```
 
-### test-genCodes.json (expected output file)
+### expected.json (expected output file)
 
 ```json
 {}
@@ -115,17 +125,32 @@ The `evalFunction` is called with every augmenting code object encountered in th
 
 ### Properties and Methods of `ProcessCodeContext` instances
 
-   * header - JSON object resulting from parsing first line of input file.
-   * globalScope - a readonly dictionary provided for use by clients which remains throughout parsing of entire input file.
-   * fileScope - an dictionary provided for use by clients which is reset at the start of processing every line of input file.
-   * fileAugCodes - JSON object resulting of parsing current line of input file other than first line.
-   * augCodeIndex - index of `augCode` parameter in `fileAugCodes.augmentingCodes` array
-   * newGenCode() - convenience method available to clients for creating a generated code object with empty `contentParts` array property.
-   * newContent(content, exactMatch=false) - convenience method available to clients for creating a new content part object with properties set with arguments supplied to the function.
+   * *header* - JSON object resulting from parsing first line of input file.
+   * *globalScope* - a readonly dictionary provided for use by clients which remains throughout parsing of entire input file.
+   * *fileScope* - an dictionary provided for use by clients which is reset at the start of processing every line of input file.
+   * *fileAugCodes* - JSON object resulting of parsing current line of input file other than first line.
+   * *augCodeIndex* - index of `augCode` parameter in `fileAugCodes.augmentingCodes` array
+   * *newGenCode()* - convenience method available to clients for creating a generated code object with empty `contentParts` array property.
+   * *newContent(content, exactMatch=false)* - convenience method available to clients for creating a new content part object with properties set with arguments supplied to the function.
+   * *newSkipGenCode()* - convenience method to create a generated code object indicating skipping of aug code section. Will have null content parts.
+   * *getScopeVar(name)* - gets a variable from fileScope array with given name, or from globalScope array if not found in fileScope.
+
+### Reserved 'CodeAugmentor' Prefix
+
+CodeAugmentor supplies utility functions and variables by reserving the **CodeAugmentor** prefix. As such scripts should avoid naming aug code processing functions and variables in fileScope/globalScope with that prefix.
+
+The following variables are provided by default in context globalScope:
+
+   * *codeAugmentor_indent* - set with value of four spaces.
+
+The following functions are provided by **CodeAugmentorFunctions** class of the `models` module of this package for use to process aug codes:
+
+   * *CodeAugmentorFunctions.setScopeVar* - requires each embedded data in augmenting code section to be a JSON object. For each such object, every property of the object is used to set a variable in context fileScope whose value is the value of the property in the JSON object.
+   * *CodeAugmentorFunctions.setGlobalScopeVar* - same as setScopeVar, but rather sets variables in context globalScope.
 
 ### Note on JSON serialization
 
-This library deserializes JSON objects into instances of the class `types.SimpleNamespace`. It similarly requires objects to be serialized to be either dictionaries or instances of `types.SimpleNamespace`. 
+This library deserializes JSON objects into instances of the class [types.SimpleNamespace](https://docs.python.org/3/library/types.html#types.SimpleNamespace). It similarly requires objects to be serialized to be either dictionaries or instances of `types.SimpleNamespace`. 
 
 By so doing clients are provided with the convenience that any arbitrary field can be set on a JSON object, and it will get serialized. 
 

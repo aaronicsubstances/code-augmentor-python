@@ -32,16 +32,12 @@
             <srcDir dir="${src.dir}">
                 <include name="*.java" />
             </srcDir>
-            <!--here we really wished there was a way to disable these 5 directives.
-                a default value is used if each is omitted.
-                So we forcefully disable by setting it to a value which cannot be
-                found: by putting a newline in the directive. Also make them unique.
-            -->
-            <genCodeStartDirective value="1&#10;" />
-            <genCodeEndDirective value="2&#10;" />
-            <skipCodeStartDirective value="3&#10;" />
-            <skipCodeEndDirective value="4&#10;" />
-            <inlineGenCodeDirectives value="5&#10;" />
+            <!--disable directives not needed aside augmenting code ones-->
+            <genCodeStartDirective value="" />
+            <genCodeEndDirective value="" />
+            <skipCodeStartDirective value="" />
+            <skipCodeEndDirective value="" />
+            <inlineGenCodeDirective value="" />
         </code_aug_prepare>
     
         <exec executable="${poetry.path}" failonerror="true" vmlauncher="false" dir="${codeGenScripts.dir}">
